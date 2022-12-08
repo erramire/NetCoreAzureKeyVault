@@ -1,3 +1,6 @@
+using Azure.Identity;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,6 +14,18 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+
+    var akvname = Environment.GetEnvironmentVariable("AKVNAME");
+
+    builder.Configuration.AddAzureKeyVault(
+        new Uri($"https://{akvname}.vault.azure.net/"),
+        new DefaultAzureCredential());
+
+}
+else
+{
+    builder.Configuration.AddEnvironmentVariables().AddUserSecrets(Assembly.GetExecutingAssembly(), true);
+
 }
 
 app.UseHttpsRedirection();
